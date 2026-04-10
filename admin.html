@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twin Creation | Master Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-[#0b0f1a] text-slate-300 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex justify-between items-center mb-10 glass p-6 rounded-2xl">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Twin Creation <span class="gradient-text">Admin</span></h1>
+                <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">v2.0 - Policy & Web Engine</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <input type="password" id="ghToken" placeholder="Enter GitHub Token" class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500">
+            </div>
+        </header>
+
+        <div class="grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-5 space-y-6">
+                <div class="glass p-6 rounded-2xl">
+                    <h2 class="text-white font-semibold mb-4 flex items-center gap-2">🛠️ App Configuration</h2>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">APP NAME</label>
+                            <input type="text" id="appName" value="Luma Notes" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">DEVELOPER EMAIL</label>
+                            <input type="text" id="devEmail" value="contact@twincreation.dev" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-500 mb-2">FEATURES & PERMISSIONS</label>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <label class="flex items-center gap-2 bg-slate-900/50 p-2 rounded hover:bg-slate-800 cursor-pointer">
+                                <input type="checkbox" class="feature-toggle" value="Camera Access"> Camera
+                            </label>
+                            <label class="flex items-center gap-2 bg-slate-900/50 p-2 rounded hover:bg-slate-800 cursor-pointer">
+                                <input type="checkbox" class="feature-toggle" value="Storage Access"> File Storage
+                            </label>
+                            <label class="flex items-center gap-2 bg-slate-900/50 p-2 rounded hover:bg-slate-800 cursor-pointer">
+                                <input type="checkbox" class="feature-toggle" value="Location Data"> Location
+                            </label>
+                            <label class="flex items-center gap-2 bg-slate-900/50 p-2 rounded hover:bg-slate-800 cursor-pointer">
+                                <input type="checkbox" class="feature-toggle" value="AdMob Integration" checked> Google AdMob
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="generatePolicy()" class="flex-1 bg-white text-black font-bold py-2 rounded-lg hover:bg-blue-400 transition">Update Content</button>
+                        <button onclick="pushToGitHub('privacy.html')" id="savePrivacy" class="flex-1 bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-500 transition">Push Privacy</button>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl">
+                    <h2 class="text-white font-semibold mb-2">💡 Pro Tip</h2>
+                    <p class="text-sm text-slate-400">Your token is stored only in this session. For security, never push this <b>admin.html</b> file to your public GitHub repo.</p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7">
+                <div class="bg-white rounded-2xl h-[700px] flex flex-col overflow-hidden shadow-2xl shadow-blue-900/20">
+                    <div class="bg-slate-100 px-6 py-3 flex justify-between items-center border-b">
+                        <span class="text-xs font-bold text-slate-400">LIVE PREVIEW - PRIVACY.HTML</span>
+                        <div class="flex gap-1">
+                            <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                        </div>
+                    </div>
+                    <div id="previewArea" class="p-10 overflow-y-auto text-slate-800 prose prose-blue max-w-none">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SMART GENERATOR LOGIC
+        function generatePolicy() {
+            const app = document.getElementById('appName').value;
+            const email = document.getElementById('devEmail').value;
+            const features = Array.from(document.querySelectorAll('.feature-toggle:checked')).map(el => el.value);
+            
+            const content = `
+                <h1 style="color:#1e293b; font-size:2.5rem; font-weight:800; margin-bottom:1rem;">Privacy Policy</h1>
+                <p>Last updated: ${new Date().toLocaleDateString()}</p>
+                <p>Twin Creation built the <strong>${app}</strong> app as a Commercial app. This SERVICE is provided by Twin Creation and is intended for use as is.</p>
+                
+                <h3 style="color:#2563eb; margin-top:2rem;">1. Information Collection and Use</h3>
+                <p>For a better experience, while using our Service, we may require you to provide us with certain personally identifiable information.</p>
+                <ul>
+                    ${features.map(f => `<li><strong>${f}:</strong> Required for core app functionality.</li>`).join('')}
+                </ul>
+
+                <h3 style="color:#2563eb; margin-top:2rem;">2. Data Safety (Google Play 2026 Compliance)</h3>
+                <p>We take your privacy seriously. Data is encrypted in transit using industry-standard protocols. Users can request data deletion by contacting us at <strong>${email}</strong>.</p>
+
+                <h3 style="color:#2563eb; margin-top:2rem;">3. Contact Us</h3>
+                <p>If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us at <strong>${email}</strong>.</p>
+                <hr style="margin-top:3rem;">
+                <p style="font-size:0.8rem; color:#64748b;">© 2026 Twin Creation | Android Development Division</p>
+            `;
+            
+            document.getElementById('previewArea').innerHTML = content;
+        }
+
+        // GITHUB PUSH LOGIC
+        async function pushToGitHub(fileName) {
+            const token = document.getElementById('ghToken').value;
+            const appFolder = document.getElementById('appName').value.toLowerCase().replace(" ", "-");
+            const btn = document.getElementById('savePrivacy');
+            const content = `
+                <!DOCTYPE html>
+                <html><head>
+                <title>Privacy - ${document.getElementById('appName').value}</title>
+                <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+                </head><body class="p-10 max-w-3xl mx-auto font-sans">
+                ${document.getElementById('previewArea').innerHTML}
+                </body></html>`;
+
+            if(!token) return alert("❌ Please enter your GitHub Token first.");
+
+            btn.innerText = "⏳ Pushing...";
+            btn.disabled = true;
+
+            const owner = "twincreation";
+            const repo = "twincreation.github.io";
+            const path = `${appFolder}/${fileName}`;
+
+            try {
+                // Get SHA
+                let sha = "";
+                const getRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${path}\`, {
+                    headers: { "Authorization": \`token \${token}\` }
+                });
+                if(getRes.ok) { const data = await getRes.json(); sha = data.sha; }
+
+                // Push
+                const pushRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${path}\`, {
+                    method: "PUT",
+                    headers: { "Authorization": \`token \${token}\`, "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: \`Admin: Updated \${fileName} for \${appFolder}\`,
+                        content: btoa(unescape(encodeURIComponent(content))),
+                        sha: sha
+                    })
+                });
+
+                if(pushRes.ok) alert("✅ Success! Page updated on GitHub.");
+                else alert("❌ GitHub Error: " + (await pushRes.json()).message);
+            } catch (e) {
+                alert("❌ Connection failed: " + e.message);
+            } finally {
+                btn.innerText = "Push Privacy";
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize
+        generatePolicy();
+    </script>
+</body>
+</html>
